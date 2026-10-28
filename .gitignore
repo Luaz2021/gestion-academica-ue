@@ -1,0 +1,27 @@
+# Maven / Eclipse
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# Logs y volcados temporales
+*.log
+*.tmp
+*.bak
+*.class
+
+# Entorno de trabajo local del usuario
+.metadata/
+.recommenders/
+local.properties
+
+# Archivos de sistema operativo
+Thumbs.db
+Desktop.ini
+.DS_Store
