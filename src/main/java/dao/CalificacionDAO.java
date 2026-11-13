@@ -9,18 +9,25 @@ import java.util.List;
 
 import database.DatabaseConexion;
 import model.CalificacionDetalle;
+import model.cursos;
 import model.modulos;
+import model.notas;
 import model.usuarios;
 import service.Queries;
 
 public class CalificacionDAO {
 
-	// Lanza la consulta en la tabla usuarios para ver si existe alguien con esa clave cifrada
-	public usuarios buscarUsuarioPorCredenciales(String identificador, String hashPassword, String rol) throws SQLException {
+	private Connection requireConexion() throws SQLException {
 		Connection conn = DatabaseConexion.getConexion();
 		if (conn == null) {
 			throw new SQLException("No hay conexion abierta con la base de datos.");
 		}
+		return conn;
+	}
+
+	// Lanza la consulta en la tabla usuarios para ver si existe alguien con esa clave cifrada
+	public usuarios buscarUsuarioPorCredenciales(String identificador, String hashPassword, String rol) throws SQLException {
+		Connection conn = requireConexion();
 
 		try (PreparedStatement ps = conn.prepareStatement(Queries.BUSCAR_USUARIO_LOGIN)) {
 			ps.setString(1, identificador);
@@ -45,10 +52,24 @@ public class CalificacionDAO {
 		return null;
 	}
 
+	// Trae el catalogo de cursos academicos desde MariaDB
+	public List<cursos> obtenerCursos() throws SQLException {
+		List<cursos> lista = new ArrayList<>();
+		Connection conn = requireConexion();
+
+		try (PreparedStatement ps = conn.prepareStatement(Queries.LISTAR_CURSOS);
+				ResultSet rs = ps.executeQuery()) {
+			while (rs.next()) {
+				lista.add(new cursos(rs.getInt("id"), rs.getString("nombre")));
+			}
+		}
+		return lista;
+	}
+
 	// Va a la tabla modulos y me trae solo las materias de este profesor
 	public List<modulos> obtenerModulosDeProfesor(int profesorId) throws SQLException {
 		List<modulos> lista = new ArrayList<>();
-		Connection conn = DatabaseConexion.getConexion();
+		Connection conn = requireConexion();
 
 		try (PreparedStatement ps = conn.prepareStatement(Queries.LISTAR_MODULOS_DOCENTE)) {
 			ps.setInt(1, profesorId);
@@ -68,40 +89,20 @@ public class CalificacionDAO {
 
 	// Junta matriculas, alumnos y notas para armar la lista de la clase que ve el profesor
 	public List<CalificacionDetalle> obtenerAlumnosPorModulo(int moduloId) throws SQLException {
-		List<CalificacionDetalle> lista = new ArrayList<>();
-		Connection conn = DatabaseConexion.getConexion();
-
-		try (PreparedStatement ps = conn.prepareStatement(Queries.LISTAR_ALUMNOS_POR_MODULO)) {
-			ps.setInt(1, moduloId);
-			try (ResultSet rs = ps.executeQuery()) {
-				while (rs.next()) {
-					Double nota = rs.getObject("nota") != null ? rs.getDouble("nota") : null;
-					lista.add(new CalificacionDetalle(
-						rs.getInt("nota_id"),
-						rs.getInt("matricula_id"),
-						rs.getInt("alumno_id"),
-						rs.getString("identificacion"),
-						rs.getString("nombre"),
-						rs.getString("apellido"),
-						rs.getInt("modulo_id"),
-						rs.getString("nom_modulo"),
-						rs.getString("nom_docente"),
-						nota,
-						rs.getString("observaciones")
-					));
-				}
-			}
-		}
-		return lista;
+		return listarDetalles(Queries.LISTAR_ALUMNOS_POR_MODULO, moduloId);
 	}
 
 	// Busca todas las asignaturas donde esta matriculado el alumno y recopila sus notas
 	public List<CalificacionDetalle> obtenerExpedienteAlumno(int alumnoId) throws SQLException {
-		List<CalificacionDetalle> lista = new ArrayList<>();
-		Connection conn = DatabaseConexion.getConexion();
+		return listarDetalles(Queries.LISTAR_EXPEDIENTE_ALUMNO, alumnoId);
+	}
 
-		try (PreparedStatement ps = conn.prepareStatement(Queries.LISTAR_EXPEDIENTE_ALUMNO)) {
-			ps.setInt(1, alumnoId);
+	private List<CalificacionDetalle> listarDetalles(String sql, int parametroId) throws SQLException {
+		List<CalificacionDetalle> lista = new ArrayList<>();
+		Connection conn = requireConexion();
+
+		try (PreparedStatement ps = conn.prepareStatement(sql)) {
+			ps.setInt(1, parametroId);
 			try (ResultSet rs = ps.executeQuery()) {
 				while (rs.next()) {
 					Double nota = rs.getObject("nota") != null ? rs.getDouble("nota") : null;
@@ -124,13 +125,13 @@ public class CalificacionDAO {
 		return lista;
 	}
 
-	// Guarda o modifica la nota final en la tabla notas
-	public boolean persistirNotaEnBD(int matriculaId, double nota, String observaciones) throws SQLException {
-		Connection conn = DatabaseConexion.getConexion();
+	// Guarda o modifica la nota final en la tabla notas usando el modelo notas
+	public boolean persistirNotaEnBD(notas calificacion) throws SQLException {
+		Connection conn = requireConexion();
 		try (PreparedStatement ps = conn.prepareStatement(Queries.GUARDAR_O_ACTUALIZAR_NOTA)) {
-			ps.setInt(1, matriculaId);
-			ps.setDouble(2, nota);
-			ps.setString(3, observaciones);
+			ps.setInt(1, calificacion.getMatricula_id());
+			ps.setDouble(2, calificacion.getNota());
+			ps.setString(3, calificacion.getObservaciones());
 			return ps.executeUpdate() > 0;
 		}
 	}

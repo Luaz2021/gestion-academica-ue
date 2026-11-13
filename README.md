@@ -1,129 +1,126 @@
-# Gestion Academica - Universidad Europea (Desarrollo de Interfaces)
+# 🎓 Sistema de Gestión Académica — Universidad Europea
 
-Aplicacion de escritorio Java Swing desarrollada bajo arquitectura en capas moderna (MVC Empresarial) para la gestion de calificaciones, alumnos y docentes de la Universidad Europea. Integra conexion a base de datos MariaDB (Laragon), autenticacion con cifrado SHA-256, diseño visual con FlatLaf y diseñador WindowBuilder en Eclipse IDE.
+![Java](https://img.shields.io/badge/Java-21%20LTS-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
+![Maven](https://img.shields.io/badge/Maven-3.x-C71A36?style=for-the-badge&logo=apachemaven&logoColor=white)
+![Swing & FlatLaf](https://img.shields.io/badge/UI-Swing%20%2B%20FlatLaf%203.4.1-2F6FED?style=for-the-badge)
+![MariaDB](https://img.shields.io/badge/MariaDB-Laragon%203306-003545?style=for-the-badge&logo=mariadb&logoColor=white)
+![Eclipse](https://img.shields.io/badge/Eclipse%20IDE-2026--09%2B-2C2255?style=for-the-badge&logo=eclipseide&logoColor=white)
 
----
-
-## Compatibilidad del Entorno y Versiones
-
-| Componente | Version Oficial Utilizada | Notas de Configuracion |
-| :--- | :--- | :--- |
-| **IDE** | **Eclipse IDE 2026-12** (o superior) | Enterprise Java and Web / Java Developers |
-| **Plugin Visual** | **WindowBuilder Pro v1.13+** | Instalar desde *Eclipse Marketplace* |
-| **JDK** | **Java 21 LTS** | `maven.compiler.source=21`, `maven.compiler.target=21` |
-| **Gestor** | **Apache Maven 3.9+** | Gestion declarativa en `pom.xml` |
-| **Base de Datos** | **MariaDB 10.4+ / MySQL 8.0+** | Servidor local (ej. Laragon / XAMPP) |
+Aplicación de escritorio en **Java 21 (Swing + FlatLaf)** bajo arquitectura **MVC + DAO + Service** para la gestión integral de matrículas, cursos, módulos y calificaciones académicas conectada a **MariaDB**.
 
 ---
 
-## Dependencias Maven Utilizadas
+## ✨ Características principales
 
-Declaradas en el archivo `pom.xml`:
-
-- `org.mariadb.jdbc:mariadb-java-client:3.3.3`: Driver oficial JDBC de alto rendimiento para MariaDB/MySQL.
-- `com.formdev:flatlaf:3.4.1`: Libreria moderna de Look & Feel para Java Swing (soporte temas claros y oscuros).
-- `org.projectlombok:lombok:1.18.32`: Generacion automatica de Getters, Setters y constructores en clases de modelo.
-- `commons-codec:commons-codec:1.16.1`: Cifrado y hashing seguro de contraseñas mediante algoritmo SHA-256.
-
----
-
-## Configuracion de la Base de Datos
-
-La aplicacion conecta mediante la clase singleton `database.DatabaseConexion.java`:
-
-- **Servidor:** `localhost:3306`
-- **Base de Datos:** `universidad_europea`
-- **Usuario:** `root`
-- **Contraseña:** *(vacia por defecto para Laragon)*
-
-### Scripts de Inicializacion (en `src/main/java/database/`)
-
-1. **`ddl.sql`**: Define el esquema relacional con integridad referencial completa:
-   - `usuarios`: Administradores, docentes y alumnos con roles y contraseñas cifradas.
-   - `cursos`: Grados universitarios (DAM, DAW, ASIR, etc.).
-   - `modulos`: Asignaturas vinculadas a cada curso.
-   - `matriculas`: Relacion entre alumnos y cursos activos.
-   - `notas`: Calificaciones desglosadas (evaluacion continua, ordinaria y extraordinaria).
-2. **`dml.sql`**: Semilla oficial con docentes, alumnos reales de la Universidad Europea y sus notas registradas.
+- 🔐 **Autenticación por roles** (`view.Login` / `LoginController`): acceso diferenciado para **Docente** y **Alumno** con hashes SHA-256 (`commons-codec`).
+- 👨‍🏫 **Panel Docente** (`view.DashDocente` / `DocenteController`):
+  - Selección automática del primer curso activo asignado al profesor.
+  - Filtrado dinámico **Curso → Módulos** y carga de matrículas asociadas.
+  - Alta, edición y validación numérica/nula de calificaciones a través de `CalificacionService` y `CalificacionDAO`.
+- 👩‍🎓 **Panel Alumno** (`view.DashAlumno` / `AlumnoController`): consulta limpia del expediente, módulos matriculados y notas obtenidas.
+- 🎨 **Interfaz moderna**: tema **FlatLightLaf** (`flatlaf 3.4.1`) con recursos gráficos corporativos en `src/main/resources`.
 
 ---
 
-## Credenciales de Acceso para Pruebas
-
-Documentadas en el reporte oficial `src/main/resources/Credenciales_Acceso_Campus_UE.pdf`.
-
-### 1. Perfil Docente
-- **Usuario:** `profesor`
-- **Contraseña:** `docente2026`
-- **Capacidades:** Visualizar listado de alumnos matriculados en sus asignaturas, filtrar por modulo y modificar calificaciones en tiempo real con guardado directo en base de datos.
-
-### 2. Perfil Alumno
-- **Usuario:** `alumno`
-- **Contraseña:** `alumno2026`
-- **Capacidades:** Consulta individual de notas por modulo, calculo de media y desglose de convocatorias ordinarias y extraordinarias en modo solo lectura.
-
----
-
-## Instalacion y Puesta en Marcha
-
-### Opcion Rapida (Instaladores Automaticos)
-- **En Windows:** Haz doble clic sobre `instalar_eclipse.bat`. Detectara tu carpeta `eclipse-workspace`, sincronizara el proyecto y validara Java y Maven en tu sistema.
-- **En Linux / macOS:** Ejecuta en la terminal:
-  ```bash
-  chmod +x instalar_eclipse.sh && ./instalar_eclipse.sh
-  ```
-
-### Importacion Manual en Eclipse
-1. Abre Eclipse IDE (2026-12 o superior).
-2. Ve al menu: `File` -> `Import...`
-3. Selecciona `Maven` -> `Existing Maven Projects` y pulsa `Next`.
-4. En `Root Directory`, pulsa `Browse...` y elige la carpeta de este repositorio (`gestion-academica-ue`).
-5. Pulsa `Finish`. Maven resolvera y descargara todas las dependencias automaticamente.
-
-### Como Abrir las Vistas con WindowBuilder
-1. En el Explorador de Proyectos de Eclipse, navega hasta `src/main/java/view/`.
-2. Haz clic derecho sobre el archivo visual deseado (`Login.java`, `DashDocente.java` o `DashAlumno.java`).
-3. Selecciona **Open With** -> **WindowBuilder Editor**.
-4. En la parte inferior del editor, alterna entre la pestaña **Source** (codigo Java) y **Design** (diseñador visual de Swing).
-
-### Ejecucion de la Aplicacion
-Para iniciar el sistema de forma segura respetando el flujo de autenticacion:
-1. Haz clic derecho sobre `src/main/java/view/Login.java`.
-2. Selecciona **Run As** -> **Java Application**.
-
----
-
-## Estructura de Arquitectura en Capas
+## 🗂️ Estructura del proyecto
 
 ```text
-src/main/java/
-├── controller/         -> Intermediarios de eventos entre la vista y la logica
-│   ├── LoginController.java
-│   ├── DocenteController.java
-│   └── AlumnoController.java
-│
-├── service/            -> Reglas de negocio y consultas centralizadas
-│   ├── Queries.java             <- Frases SQL centralizadas y auditables
-│   └── CalificacionService.java <- Logica de calculo, promedios y validaciones
-│
-├── dao/                -> Data Access Object (Persistencia e interaccion JDBC pura)
-│   └── CalificacionDAO.java
-│
-├── database/           -> Singleton de conexion y scripts de despliegue SQL
-│   ├── DatabaseConexion.java
-│   ├── ddl.sql
-│   └── dml.sql
-│
-├── model/              -> Clases entidad (DTO)
-│   ├── CalificacionDetalle.java
-│   ├── usuarios.java
-│   ├── cursos.java
-│   ├── modulos.java
-│   ├── matriculas.java
-│   └── notas.java
-│
-└── view/               -> Formularios visuales Swing diseñados con WindowBuilder
-    ├── Login.java
-    ├── DashDocente.java
-    └── DashAlumno.java
+gestion-academica-ue/
+├── Ejecutar_Gestion_UE.launch      # Lanzador portable para Eclipse (M2E + Java 21)
+├── ejecutar.bat                    # Compilador y lanzador directo en Windows (sin abrir Eclipse)
+├── instalar_eclipse.bat            # Vincula/copia el repo al workspace de Eclipse (Windows)
+├── instalar_eclipse.sh             # Vincula el repo al workspace de Eclipse (Linux / macOS)
+├── pom.xml                         # Dependencias y plugins Maven (Compiler + Lombok + Exec)
+└── src/main/
+    ├── java/
+    │   ├── controller/             # LoginController, DocenteController, AlumnoController
+    │   ├── dao/                    # CalificacionDAO
+    │   ├── database/               # DatabaseConexion, ddl.sql, dml.sql
+    │   ├── model/                  # usuarios, cursos, modulos, matriculas, notas, CalificacionDetalle
+    │   ├── service/                # CalificacionService, Queries
+    │   └── view/                   # Login (main), DashDocente, DashAlumno
+    └── resources/                  # logo_ue.png, fondo_ue.jpg, fondo_ue_scaled.png
 ```
+
+---
+
+## 📦 Dependencias y plugins (`pom.xml`)
+
+| Artefacto | Grupo | Versión | Uso |
+| :--- | :--- | :---: | :--- |
+| `mariadb-java-client` | `org.mariadb.jdbc` | `3.3.3` | Driver JDBC oficial para MariaDB / MySQL (Laragon) |
+| `flatlaf` | `com.formdev` | `3.4.1` | Look & Feel moderno para Java Swing |
+| `lombok` | `org.projectlombok` | `1.18.38` | Generación en compilación (`provided` + `annotationProcessorPaths`) |
+| `commons-codec` | `commons-codec` | `1.16.1` | Utilidades criptográficas (SHA-256) |
+| `slf4j-nop` | `org.slf4j` | `2.0.16` | Implementación silenciosa de SLF4J en consola |
+| `maven-compiler-plugin` | `org.apache.maven.plugins` | `3.13.0` | Compilación Java 21 UTF-8 con procesador de Lombok |
+| `exec-maven-plugin` | `org.codehaus.mojo` | `3.5.0` | Ejecución directa de `view.Login` vía Maven |
+
+---
+
+## 🗄️ Base de datos (MariaDB / Laragon)
+
+La aplicación conecta por defecto mediante `database.DatabaseConexion` a:
+
+- **Host / Puerto:** `localhost:3306`
+- **Base de datos:** `universidad_europea`
+- **Usuario / Contraseña:** `root` / *(vacía, configuración estándar de Laragon)*
+
+### Inicialización rápida del esquema y datos
+
+1. Inicia **Laragon** (o tu servidor MariaDB/MySQL) en el puerto `3306`.
+2. Ejecuta en orden sobre MariaDB:
+   - `src/main/java/database/ddl.sql` *(estructura de tablas y claves foráneas)*
+   - `src/main/java/database/dml.sql` *(datos semilla de cursos, módulos, usuarios y notas)*
+
+---
+
+## 🚀 Cómo ejecutar la aplicación
+
+### Opción 1 — Desde Eclipse IDE (`2026-09` o superior)
+
+1. *(Opcional)* Ejecuta `instalar_eclipse.bat` (Windows) o `./instalar_eclipse.sh` (Linux/macOS) para enlazar el repositorio con tu `eclipse-workspace`.
+2. Abre Eclipse y ve a **File → Import... → Maven → Existing Maven Projects** seleccionando la carpeta del proyecto.
+3. Si es la primera vez tras clonar o actualizar `pom.xml`, haz **clic derecho en el proyecto → Maven → Update Project...** (`Alt + F5`).
+4. Para arrancar la aplicación:
+   - Haz **clic derecho sobre `Ejecutar_Gestion_UE.launch` → Run As → Ejecutar_Gestion_UE**, **o** ejecuta `src/main/java/view/Login.java` con **Run As → Java Application**.
+
+> **Nota para diseño visual:** haz clic derecho sobre cualquier vista (`Login.java`, `DashDocente.java`, `DashAlumno.java`) → **Open With → WindowBuilder Editor**.
+
+### Opción 2 — Sin abrir Eclipse (Windows, 1 clic)
+
+Si quieres saltarte las manías de Eclipse tras compilar dependencias una vez:
+
+```bat
+ejecutar.bat
+```
+
+El script comprueba `javac` (JDK 21+), localiza los `.jar` en `%USERPROFILE%\.m2\repository`, compila `src\main\java` con `-encoding UTF-8`, copia `src\main\resources` a `target\classes` y arranca `view.Login`.
+
+### Opción 3 — Con Maven CLI
+
+```bash
+mvn clean compile exec:java
+```
+
+---
+
+## 🛠️ Solución rápida de problemas en Eclipse
+
+- **Lombok marca errores en getters/setters o constructores:**
+  Verifica que `eclipse.ini` incluya `-javaagent:<ruta>\lombok.jar` (instalador oficial de `lombok-1.18.38.jar`) y ejecuta **Project → Clean...** seguido de **Maven → Update Project**.
+- **Faltan JARs al usar `ejecutar.bat`:**
+  Ejecuta **Maven → Update Project** dentro de Eclipse una sola vez para poblar `%USERPROFILE%\.m2\repository` (o `mvn dependency:resolve` si tienes Maven en el PATH).
+- **Error de conexión al iniciar sesión:**
+  Confirma que el servicio MariaDB/MySQL está iniciado en `localhost:3306` y que ejecutaste `ddl.sql` y `dml.sql`.
+
+---
+
+## 🔑 Credenciales de acceso (`dml.sql`)
+
+Ejemplo de cuentas incluidas en `src/main/java/database/dml.sql` (consulta ese script o `src/main/resources/Credenciales_Acceso_Campus_UE.pdf` para el listado completo):
+
+| Rol | Usuario | Contraseña |
+| :--- | :--- | :--- |
+| 👨‍🏫 **Docente** | `UEM-DOC-BM` | `UEMBOMA00` |
+| 👩‍🎓 **Alumno** | `UEM-ALUM-SAM` | `UEMSAMA21` |

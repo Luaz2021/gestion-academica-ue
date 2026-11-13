@@ -75,10 +75,14 @@ echo                      INSTALACION COMPLETADA
 echo ======================================================================
 echo.
 echo Pasos para abrir en Eclipse:
-echo   1. Abre Eclipse IDE 2026-12 (o superior).
+echo   1. Abre Eclipse IDE 2026-09 (o superior) con Lombok configurado (-javaagent:lombok.jar).
 echo   2. Ve a: File -^> Import... -^> Maven -^> Existing Maven Projects.
 echo   3. Selecciona la carpeta: "!TARGET_WS!\gestion-academica-ue"
-echo   4. Pulsa Finish y espera a que Maven descargue las librerias.
+echo   4. Pulsa Finish y espera a que Maven descargue las librerias (Maven -^> Update Project).
+echo   5. Ejecuta haciendo clic derecho en Ejecutar_Gestion_UE.launch -^> Run As -^> Ejecutar_Gestion_UE.
+echo.
+echo Alternativa sin abrir Eclipse:
+echo   - Ejecuta directamente ejecutar.bat desde la raiz del proyecto.
 echo.
 echo Para abrir el disenador visual:
 echo   - Clic derecho en Login.java -^> Open With -^> WindowBuilder Editor.

@@ -10,4 +10,9 @@ public class modulos {
 	private String nombre;
 	private int curso_id;
 	private int profesor_id;
+
+	@Override
+	public String toString() {
+		return nombre;
+	}
 }

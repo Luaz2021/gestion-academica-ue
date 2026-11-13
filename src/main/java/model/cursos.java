@@ -8,4 +8,9 @@ import lombok.*;
 public class cursos {
 	private int id;
 	private String nombre;
+
+	@Override
+	public String toString() {
+		return nombre;
+	}
 }

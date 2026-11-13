@@ -21,6 +21,8 @@ import javax.swing.table.DefaultTableModel;
 
 import com.formdev.flatlaf.FlatLightLaf;
 
+import model.cursos;
+import model.modulos;
 import model.usuarios;
 
 /*
@@ -38,8 +40,8 @@ public class DashDocente extends JFrame {
 	private JPanel panelFormulario;
 	private JTable tablaAlumnos;
 	private DefaultTableModel modeloTabla;
-	private JComboBox<String> comboCursos;
-	private JComboBox<String> comboModulos;
+	private JComboBox<cursos> comboCursos;
+	private JComboBox<modulos> comboModulos;
 	private JTextField txtAlumnoSeleccionado;
 	private JTextField txtNota;
 	private JTextField txtObservaciones;
@@ -140,7 +142,7 @@ public class DashDocente extends JFrame {
 		lblCurso.setBounds(20, 20, 120, 20);
 		panelFiltros.add(lblCurso);
 
-		comboCursos = new JComboBox<>(new String[]{"1º DAM - Desarrollo de Apps Multiplataforma", "2º DAM - Desarrollo de Apps Multiplataforma"});
+		comboCursos = new JComboBox<>();
 		comboCursos.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		comboCursos.setBounds(145, 15, 310, 32);
 		panelFiltros.add(comboCursos);
@@ -256,8 +258,8 @@ public class DashDocente extends JFrame {
 	public usuarios getDocenteActivo() { return docenteActivo; }
 	public JTable getTablaAlumnos() { return tablaAlumnos; }
 	public DefaultTableModel getModeloTabla() { return modeloTabla; }
-	public JComboBox<String> getComboCursos() { return comboCursos; }
-	public JComboBox<String> getComboModulos() { return comboModulos; }
+	public JComboBox<cursos> getComboCursos() { return comboCursos; }
+	public JComboBox<modulos> getComboModulos() { return comboModulos; }
 	public JTextField getTxtAlumnoSeleccionado() { return txtAlumnoSeleccionado; }
 	public JTextField getTxtNota() { return txtNota; }
 	public JTextField getTxtObservaciones() { return txtObservaciones; }

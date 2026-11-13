@@ -7,7 +7,9 @@ import org.apache.commons.codec.digest.DigestUtils;
 
 import dao.CalificacionDAO;
 import model.CalificacionDetalle;
+import model.cursos;
 import model.modulos;
+import model.notas;
 import model.usuarios;
 
 
@@ -33,6 +35,11 @@ public class CalificacionService {
 
 		// Con el hash listo, mandamos a consultar a la base de datos
 		return dao.buscarUsuarioPorCredenciales(identificador.trim(), hash, rol.trim());
+	}
+
+	// Pide al DAO los cursos academicos disponibles en BD
+	public List<cursos> cargarCursos() throws SQLException {
+		return dao.obtenerCursos();
 	}
 
 	// Pide al DAO las materias asignadas a un profesor para llenar su desplegable
@@ -70,7 +77,12 @@ public class CalificacionService {
 
 		String comentariosLimpios = (comentarios != null) ? comentarios.trim() : "";
 
-		// Una vez validadas todas las reglas, le decimos al DAO que lo guarde en MariaDB
-		return dao.persistirNotaEnBD(matriculaId, notaNumerica, comentariosLimpios);
+		// Construimos el modelo notas validado antes de enviarlo al DAO
+		notas calificacion = new notas();
+		calificacion.setMatricula_id(matriculaId);
+		calificacion.setNota(notaNumerica);
+		calificacion.setObservaciones(comentariosLimpios);
+
+		return dao.persistirNotaEnBD(calificacion);
 	}
 }
